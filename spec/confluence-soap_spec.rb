@@ -1,6 +1,6 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'spec_helper'
 
-describe "ConfluenceSoap" do
+describe ConfluenceSoap do
   let (:url) {"http://example.com?wsdl"}
   subject {ConfluenceSoap.new(url, 'user', 'password')}
 
