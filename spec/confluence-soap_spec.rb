@@ -4,6 +4,10 @@ describe "ConfluenceSoap" do
   let (:url) {"http://example.com?wsdl"}
   subject {ConfluenceSoap.new(url, 'user', 'password')}
 
+  describe "Page" do
+    ConfluenceSoap::Page.new.to_h
+  end
+
   describe "#initialize" do
     it "should create a savon soap client with url provided" do
       Savon.should_receive(:client).with(wsdl: url)

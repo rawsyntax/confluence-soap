@@ -3,6 +3,8 @@ require 'savon'
 class ConfluenceSoap
   attr_reader :client, :token
 
+  Page = Struct.new(:content, :content_status, :created, :creator, :current, :home_page, :modified, :modifier)
+
   def initialize url, user, password
     @client = Savon.client(wsdl: url)
     @token = login(user, password)
@@ -26,6 +28,11 @@ class ConfluenceSoap
   def move_page source, target, position=0
     response = @client.call :move_page, message: {in0: @token, in1: source, in2: target, in3: position}
     parse_response :move_page, response
+  end
+
+  def store_page page
+    response = @client.call :store_page, message: {in0: @token, remote_page: page}
+    parse_response :store_page, response
   end
 
   private
