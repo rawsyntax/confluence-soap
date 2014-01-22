@@ -23,6 +23,11 @@ class ConfluenceSoap
     parse_response :get_children, response
   end
 
+  def move_page source, target, position=0
+    response = @client.call :move_page, message: {in0: @token, in1: source, in2: target, in3: position}
+    parse_response :move_page, response
+  end
+
   private
   def parse_response method, response
     response.body["#{method}_response".to_sym]["#{method}_return".to_sym]["#{method}_return".to_sym]

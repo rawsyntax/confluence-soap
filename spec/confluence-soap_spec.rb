@@ -42,5 +42,17 @@ describe "ConfluenceSoap" do
       subject.get_children('page_id').should == []
     end
   end
-  
+
+  describe "#move_page" do
+    before (:each) {
+      ConfluenceSoap.any_instance.stub(:login).and_return("token")
+      subject.client.should_receive(:call)
+        .with(:move_page, message: {in0: 'token', in1: 'source', in2: 'target', in3: 0})
+        .and_return(double(:response, body: {move_page_response: {move_page_return: {move_page_return: []}}}))
+    }
+    it "should login if there is no token" do
+      subject.move_page('source', 'target')
+    end
+  end
+
 end
