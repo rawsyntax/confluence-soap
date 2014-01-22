@@ -3,7 +3,7 @@ require 'savon'
 class ConfluenceSoap
   attr_reader :client, :token
 
-  Page = Struct.new(:content, :content_status, :created, :creator, :current, :home_page, :modified, :modifier)
+  Page = Struct.new(:content, :contentStatus, :title, :space, :parentId, :permissions)
 
   def initialize url, user, password
     @client = Savon.client(wsdl: url)
@@ -17,26 +17,31 @@ class ConfluenceSoap
 
   def get_pages space
     response = @client.call :get_pages, message: {in0: @token, in1: space}
-    parse_response :get_pages, response
+    parse_array_response :get_pages, response
+  end
+
+  def get_page page_id
+    response = @client.call :get_page, message: {in0: @token, in1: page_id}
+    parse_response :get_page, response
   end
 
   def get_children page_id
     response = @client.call :get_children, message: {in0: @token, in1: page_id}
-    parse_response :get_children, response
-  end
-
-  def move_page source, target, position=0
-    response = @client.call :move_page, message: {in0: @token, in1: source, in2: target, in3: position}
-    parse_response :move_page, response
+    parse_array_response :get_children, response
   end
 
   def store_page page
-    response = @client.call :store_page, message: {in0: @token, remote_page: page}
+    response = @client.call :store_page, message: {in0: @token, in1: page.to_h}
     parse_response :store_page, response
   end
 
   private
+
+  def parse_array_response method, response
+    parse_response(method, response)["#{method}_return".to_sym]
+  end
+
   def parse_response method, response
-    response.body["#{method}_response".to_sym]["#{method}_return".to_sym]["#{method}_return".to_sym]
+    response.body["#{method}_response".to_sym]["#{method}_return".to_sym]
   end
 end
