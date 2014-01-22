@@ -1,6 +1,7 @@
 = confluence-soap
 
-Description goes here.
+Ruby client for Confluence's SOAP API
+http://<confluence-install>/rpc/soap-axis/confluenceservice-v2?wsdl
 
 == Contributing to confluence-soap
  
