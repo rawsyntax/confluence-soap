@@ -35,6 +35,15 @@ class ConfluenceSoap
     parse_response :store_page, response
   end
 
+  def search(term, criteria = {})
+    limit    = criteria.delete(:limit) || 20
+    criteria = criteria.map { |k, v| {key: k, value: v} }
+    response =
+      @client.call(:search, message: {
+                     in0: @token, in1: term, in2: {item: criteria}, in3: limit})
+    parse_array_response :search, response
+  end
+
   private
 
   def parse_array_response method, response

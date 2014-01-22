@@ -95,4 +95,19 @@ describe ConfluenceSoap do
     end
   end
 
+  describe '#search' do
+    let(:term) { 'search term' }
+    let(:criteria) { {item: [{key: :spaceKey, value: 'SpaceName'}]} }
+    before (:each)  do
+      ConfluenceSoap.any_instance.stub(:login).and_return('token')
+      subject.client.should_receive(:call)
+        .with(:search,
+              message: {in0: 'token', in1: term, in2: criteria, in3: 20})
+        .and_return(double(:response, body: {search_response: {search_return: {search_return: []}}}))
+    end
+
+    it 'should search with savon' do
+      subject.search(term, spaceKey: 'SpaceName').should == []
+    end
+  end
 end
