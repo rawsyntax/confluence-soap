@@ -1,7 +1,7 @@
 require 'savon'
 
 class ConfluenceSoap
-  attr_reader :client, :token
+  attr_reader :client, :token, :user
 
   Page = Struct.new(:content, :content_status, :created, :creator, :current, :home_page, :id,
                     :modified, :modifier, :parent_id, :permissions, :space, :title, :url, :version) do
@@ -16,6 +16,8 @@ class ConfluenceSoap
   end
 
   def initialize url, user, password
+    @user = user
+    @password = password
     @client = Savon.client(wsdl: url) do
       convert_request_keys_to :lower_camelcase
     end
@@ -73,7 +75,23 @@ class ConfluenceSoap
     pages.map { |page| Page.from_hash(page) }
   end
 
+  def has_user user
+    response =
+      @client.call(:has_user, message: { in0: @token, in1: user })
+    parse_response(:has_user, response)
+  end
+
+  def execute &block
+    yield
+    rescue Savon::SOAPFault => e
+      reconnect if e.to_hash[:fault][:faultstring] =~ /InvalidSessionException/
+      yield
+  end
+
   private
+  def reconnect
+    login(@user, @password)
+  end
 
   def parse_array_response method, response
     parse_response(method, response)["#{method}_return".to_sym]
