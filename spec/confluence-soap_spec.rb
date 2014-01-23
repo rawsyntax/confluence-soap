@@ -79,19 +79,40 @@ describe ConfluenceSoap do
 
   describe '#store_page' do
     let(:page) do
-      ConfluenceSoap::Page.new('test', 'current', 'Testing API ', 'Space Name',
-                               'parent_id', 0)
+      ConfluenceSoap::Page.from_hash({content: 'test', title: 'Testing API ', space: 'Space Name',
+                                     parent_id: 'parent_id', permissions: 0})
     end
 
     before (:each)  do
       ConfluenceSoap.any_instance.stub(:login).and_return('token')
       subject.client.should_receive(:call)
-        .with(:store_page, message: {in0: 'token', in1: page.to_h})
+        .with(:store_page, message: {in0: 'token', in1: {content: 'test', title: 'Testing API ',
+                                      space: 'Space Name', parentId: 'parent_id', permissions: 0}})
         .and_return(double(:response, body: {store_page_response: {store_page_return: {}}}))
     end
 
     it 'should store page with savon' do
       subject.store_page(page)
+    end
+  end
+
+  describe '#update_page' do
+    let(:page) do
+      ConfluenceSoap::Page.from_hash({content: 'test', title: 'Testing API ', space: 'Space Name',
+                                     parent_id: 'parent_id', permissions: 0})
+    end
+
+    before (:each)  do
+      ConfluenceSoap.any_instance.stub(:login).and_return('token')
+      subject.client.should_receive(:call)
+        .with(:update_page, message: {in0: 'token', in1: {content: 'test', title: 'Testing API ',
+                                      space: 'Space Name', parentId: 'parent_id', permissions: 0},
+                                      in2: {minorEdit: true}})
+        .and_return(double(:response, body: {update_page_response: {update_page_return: {}}}))
+    end
+
+    it 'should store page with savon' do
+      subject.update_page(page)
     end
   end
 

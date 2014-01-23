@@ -1,6 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    activesupport (3.2.16)
+      i18n (~> 0.6, >= 0.6.4)
+      multi_json (~> 1.0)
     addressable (2.3.5)
     akami (1.2.0)
       gyoku (>= 0.4.0)
@@ -27,6 +30,7 @@ GEM
     httpi (2.1.0)
       rack
       rubyntlm (~> 0.3.2)
+    i18n (0.6.9)
     jeweler (2.0.0)
       builder
       bundler (>= 1.0)
@@ -88,6 +92,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   bundler (~> 1.0)
   jeweler (~> 2.0.0)
   rdoc (~> 3.12)
