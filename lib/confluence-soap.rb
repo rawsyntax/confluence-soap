@@ -54,6 +54,11 @@ class ConfluenceSoap
     Page.from_hash parse_response :update_page, response
   end
 
+  def remove_page page_id
+    response = @client.call :remove_page, message: {in0: @token, in1: page_id}
+    Page.from_hash parse_response :remove_page, response
+  end
+
   def search(term, criteria = {})
     limit    = criteria.delete(:limit) || 20
     criteria = criteria.map { |k, v| {key: k, value: v} }

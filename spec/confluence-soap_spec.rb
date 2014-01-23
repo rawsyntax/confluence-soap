@@ -64,6 +64,19 @@ describe ConfluenceSoap do
     end
   end
 
+  describe '#get_page' do
+    let(:page_id) { '123456' }
+    before (:each) do
+      ConfluenceSoap.any_instance.stub(:login).and_return('token')
+      subject.client.should_receive(:call)
+        .with(:remove_page, message: {in0: 'token', in1: page_id})
+        .and_return(double(:response, body: {remove_page_response: {remove_page_return: {}}}))
+    end
+
+    it 'should return the page' do
+      subject.remove_page page_id
+    end
+  end
   describe '#get_children' do
     before (:each) do
       ConfluenceSoap.any_instance.stub(:login).and_return('token')
