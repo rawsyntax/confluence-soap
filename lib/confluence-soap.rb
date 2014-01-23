@@ -1,5 +1,4 @@
 require 'savon'
-require 'active_support/core_ext/string'
 
 class ConfluenceSoap
   attr_reader :client, :token
@@ -12,15 +11,14 @@ class ConfluenceSoap
 
     SKIPPED_KEYS = [:content_status, :created, :creator, :current, :home_page, :modified, :modifier, :url]
     def to_soap
-      to_h.inject({}) do |hash, (k,v)|
-        hash[k.to_s.camelize(:lower).to_sym] = v unless (v.nil? || SKIPPED_KEYS.include?(k))
-        hash
-      end
+      to_h.reject {|k,v| v.nil? || SKIPPED_KEYS.include?(k)}
     end
   end
 
   def initialize url, user, password
-    @client = Savon.client(wsdl: url)
+    @client = Savon.client(wsdl: url) do
+      convert_request_keys_to :lower_camelcase
+    end
     @token = login(user, password)
   end
 

@@ -100,7 +100,7 @@ describe ConfluenceSoap do
       ConfluenceSoap.any_instance.stub(:login).and_return('token')
       subject.client.should_receive(:call)
         .with(:store_page, message: {in0: 'token', in1: {content: 'test', title: 'Testing API ',
-                                      space: 'Space Name', parentId: 'parent_id', permissions: 0}})
+                                      space: 'Space Name', parent_id: 'parent_id', permissions: 0}})
         .and_return(double(:response, body: {store_page_response: {store_page_return: {}}}))
     end
 
@@ -119,7 +119,7 @@ describe ConfluenceSoap do
       ConfluenceSoap.any_instance.stub(:login).and_return('token')
       subject.client.should_receive(:call)
         .with(:update_page, message: {in0: 'token', in1: {content: 'test', title: 'Testing API ',
-                                      space: 'Space Name', parentId: 'parent_id', permissions: 0},
+                                      space: 'Space Name', parent_id: 'parent_id', permissions: 0},
                                       in2: {minorEdit: true}})
         .and_return(double(:response, body: {update_page_response: {update_page_return: {}}}))
     end
@@ -131,7 +131,7 @@ describe ConfluenceSoap do
 
   describe '#search' do
     let(:term) { 'search term' }
-    let(:criteria) { {item: [{key: :spaceKey, value: 'SpaceName'}]} }
+    let(:criteria) { {item: [{key: :space_key, value: 'SpaceName'}]} }
     before (:each)  do
       ConfluenceSoap.any_instance.stub(:login).and_return('token')
       subject.client.should_receive(:call)
@@ -141,7 +141,7 @@ describe ConfluenceSoap do
     end
 
     it 'should search with savon' do
-      subject.search(term, spaceKey: 'SpaceName').should == []
+      subject.search(term, space_key: 'SpaceName').should == []
     end
   end
 end
