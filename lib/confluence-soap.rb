@@ -12,8 +12,10 @@ class ConfluenceSoap
 
     SKIPPED_KEYS = [:content_status, :created, :creator, :current, :home_page, :modified, :modifier, :url]
     def to_soap
-      to_h.reject { |k,v| v.nil? || SKIPPED_KEYS.include?(k) }
-          .inject({}) {|hash, (k,v)| hash[k.to_s.camelize(:lower).to_sym] = v; hash}
+      to_h.inject({}) do |hash, (k,v)|
+        hash[k.to_s.camelize(:lower).to_sym] = v unless (v.nil? || SKIPPED_KEYS.include?(k))
+        hash
+      end
     end
   end
 
@@ -25,6 +27,10 @@ class ConfluenceSoap
   def login user, password
     response = @client.call :login, message: {in0: user, in1: password}
     @token = response.body[:login_response][:login_return]
+  end
+
+  def logout
+    @client.call :logout, message: {in0: @token} if @token
   end
 
   def get_pages space
