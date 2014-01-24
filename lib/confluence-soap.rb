@@ -82,10 +82,10 @@ class ConfluenceSoap
   end
 
   def execute &block
-    yield
+    yield self
     rescue Savon::SOAPFault => e
       reconnect if e.to_hash[:fault][:faultstring] =~ /InvalidSessionException/
-      yield
+      yield e
   end
 
   private

@@ -144,4 +144,19 @@ describe ConfluenceSoap do
       subject.search(term, space_key: 'SpaceName').should == []
     end
   end
+
+  describe '#execute' do
+    before (:each)  do
+      ConfluenceSoap.any_instance.stub(:login).and_return('token')
+      subject.should_receive(:login)
+    end
+
+    it 'should reconnect when session is invalid' do
+      Savon::SOAPFault.any_instance.stub(:to_hash).and_return({fault: {faultstring: 'InvalidSessionException'}})
+      ex = Savon::SOAPFault.new nil, nil
+      subject.execute do |x|
+        raise ex if x.is_a? ConfluenceSoap
+      end
+    end
+  end
 end
