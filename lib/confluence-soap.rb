@@ -34,34 +34,34 @@ class ConfluenceSoap
   end
 
   def get_pages space
-    response = @client.call :get_pages, message: {in0: @token, in1: space}
+    response = @client.call :get_pages, auth_message({in1: space})
     pages = parse_array_response :get_pages, response
     pages.map { |page| Page.from_hash(page) }
   end
 
   def get_page page_id
-    response = @client.call :get_page, message: {in0: @token, in1: page_id}
+    response = @client.call :get_page, auth_message({in1: page_id})
     Page.from_hash parse_response :get_page, response
   end
 
   def get_children page_id
-    response = @client.call :get_children, message: {in0: @token, in1: page_id}
+    response = @client.call :get_children, auth_message({in1: page_id})
     pages = parse_array_response :get_children, response
     pages.map { |page| Page.from_hash(page) }
   end
 
   def store_page page
-    response = @client.call :store_page, message: {in0: @token, in1: page.to_soap}
+    response = @client.call :store_page, auth_message({in1: page.to_soap})
     Page.from_hash parse_response :store_page, response
   end
 
   def update_page page
-    response = @client.call :update_page, message: {in0: @token, in1: page.to_soap, in2: {minorEdit: true}}
+    response = @client.call :update_page, auth_message({in1: page.to_soap, in2: {minorEdit: true} })
     Page.from_hash parse_response :update_page, response
   end
 
   def remove_page page_id
-    response = @client.call :remove_page, message: {in0: @token, in1: page_id}
+    response = @client.call :remove_page, auth_message({in1: page_id})
     Page.from_hash parse_response :remove_page, response
   end
 
@@ -69,15 +69,14 @@ class ConfluenceSoap
     limit    = criteria.delete(:limit) || 20
     criteria = criteria.map { |k, v| {key: k, value: v} }
     response =
-      @client.call(:search, message: {
-                     in0: @token, in1: term, in2: {item: criteria}, in3: limit})
+      @client.call(:search, auth_message({in1: term, in2: {item: criteria} , in3: limit}))
     pages = parse_array_response :search, response
     pages.map { |page| Page.from_hash(page) }
   end
 
   def has_user user
     response =
-      @client.call(:has_user, message: { in0: @token, in1: user })
+      @client.call(:has_user, auth_message({in1: user }))
     parse_response(:has_user, response)
   end
 
@@ -96,6 +95,10 @@ class ConfluenceSoap
 
   def parse_array_response method, response
     parse_response(method, response)["#{method}_return".to_sym] || []
+  end
+
+  def auth_message(params = {})
+    {message: params.merge(in0: @token)}
   end
 
   def parse_response method, response
