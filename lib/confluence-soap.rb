@@ -84,6 +84,14 @@ class ConfluenceSoap
     parse_response(:add_label_by_name, response)
   end
 
+  def remove_label_by_name(label, page_id)
+    response =
+      @client.call(:remove_label_by_name,
+                   auth_message({in1: label, in2: page_id}))
+
+    parse_response(:remove_label_by_name, response)
+  end
+
   def has_user user
     response = @client.call(:has_user, auth_message({in1: user}))
     parse_response(:has_user, response)
