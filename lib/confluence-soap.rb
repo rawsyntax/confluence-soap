@@ -89,12 +89,13 @@ class ConfluenceSoap
   end
 
   private
+
   def reconnect
     login(@user, @password)
   end
 
   def parse_array_response method, response
-    parse_response(method, response)["#{method}_return".to_sym]
+    parse_response(method, response)["#{method}_return".to_sym] || []
   end
 
   def parse_response method, response
