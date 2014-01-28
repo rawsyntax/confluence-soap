@@ -56,7 +56,9 @@ class ConfluenceSoap
   end
 
   def update_page page
-    response = @client.call :update_page, auth_message({in1: page.to_soap, in2: {minorEdit: true} })
+    response =
+      @client.call(:update_page,
+                   auth_message({in1: page.to_soap, in2: {minorEdit: true} }))
     Page.from_hash parse_response :update_page, response
   end
 
@@ -69,14 +71,21 @@ class ConfluenceSoap
     limit    = criteria.delete(:limit) || 20
     criteria = criteria.map { |k, v| {key: k, value: v} }
     response =
-      @client.call(:search, auth_message({in1: term, in2: {item: criteria} , in3: limit}))
+      @client.call(:search,
+                   auth_message({in1: term, in2: {item: criteria}, in3: limit}))
     pages = parse_array_response :search, response
     pages.map { |page| Page.from_hash(page) }
   end
 
-  def has_user user
+  def add_label_by_name(label, page_id)
     response =
-      @client.call(:has_user, auth_message({in1: user }))
+      @client.call(:add_label_by_name, auth_message({in1: label, in2: page_id}))
+
+    parse_response(:add_label_by_name, response)
+  end
+
+  def has_user user
+    response = @client.call(:has_user, auth_message({in1: user}))
     parse_response(:has_user, response)
   end
 
@@ -98,7 +107,7 @@ class ConfluenceSoap
   end
 
   def auth_message(params = {})
-    {message: params.merge(in0: @token)}
+    {message: {in0: @token}.merge(params)}
   end
 
   def parse_response method, response

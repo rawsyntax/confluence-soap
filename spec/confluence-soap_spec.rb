@@ -145,6 +145,20 @@ describe ConfluenceSoap do
     end
   end
 
+  describe '#add_label_by_name' do
+    before(:each) do
+      ConfluenceSoap.any_instance.stub(:login).and_return('token')
+      subject.client.should_receive(:call)
+        .with(:add_label_by_name, message: {in0: 'token', in1: 'faq', in2: 1})
+        .and_return(double(:response, body: {add_label_by_name_response: {add_label_by_name_return: true}}))
+    end
+
+
+    it 'should add a label to the page' do
+      subject.add_label_by_name('faq', 1).should == true
+    end
+  end
+
   describe '#execute' do
     before (:each)  do
       ConfluenceSoap.any_instance.stub(:login).and_return('token')
