@@ -5,16 +5,16 @@
 
 Gem::Specification.new do |s|
   s.name = "confluence-soap"
-  s.version = "0.0.1"
+  s.version = "0.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ping Yu", "Eric Himmelreich"]
-  s.date = "2014-01-22"
+  s.date = "2014-01-28"
   s.description = ""
   s.email = ["ping@intridea.com", "eric@intridea.com"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.md"
   ]
   s.files = [
     ".document",
@@ -23,11 +23,10 @@ Gem::Specification.new do |s|
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
-    "README.rdoc",
+    "README.md",
     "Rakefile",
     "VERSION",
     "confluence-soap.gemspec",
-    "lib/.DS_Store",
     "lib/confluence-soap.rb",
     "spec/confluence-soap_spec.rb",
     "spec/spec_helper.rb"
