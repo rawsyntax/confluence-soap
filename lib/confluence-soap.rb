@@ -115,8 +115,11 @@ class ConfluenceSoap
     login(@user, @password)
   end
 
-  def parse_array_response method, response
-    parse_response(method, response)["#{method}_return".to_sym] || []
+  def parse_array_response(method, response)
+    parsed_response =
+      parse_response(method, response)["#{method}_return".to_sym] || []
+
+    parsed_response.respond_to?(:to_hash) ? [parsed_response] : parsed_response
   end
 
   def auth_message(params = {})
