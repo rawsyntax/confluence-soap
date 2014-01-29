@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "confluence-soap"
-  s.version = "0.0.5"
+  s.version = "0.0.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ping Yu", "Eric Himmelreich"]
-  s.date = "2014-01-28"
+  s.date = "2014-01-29"
   s.description = ""
   s.email = ["ping@intridea.com", "eric@intridea.com"]
   s.extra_rdoc_files = [
