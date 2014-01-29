@@ -6,7 +6,7 @@ class ConfluenceSoap
   Page = Struct.new(:content, :content_status, :created, :creator, :current, :home_page, :id,
                     :modified, :modifier, :parent_id, :permissions, :space, :title, :url, :version) do
     def self.from_hash h
-      values = h.values_at(*Page.members.map {|m|m.to_sym}).map {|v| v.is_a?(Hash) ? v['value']||'' : v}
+      values = h.values_at(*Page.members.map {|m|m.to_sym}).map {|v| v.is_a?(Hash) ? v[:value]||'' : v}
       self.new *values
     end
 
