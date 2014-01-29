@@ -3,16 +3,22 @@ require 'savon'
 class ConfluenceSoap
   attr_reader :client, :token, :user
 
-  Page = Struct.new(:content, :content_status, :created, :creator, :current, :home_page, :id,
-                    :modified, :modifier, :parent_id, :permissions, :space, :title, :url, :version) do
+  Page = Struct.new(:content, :content_status, :created, :creator, :current,
+                    :home_page, :id, :modified, :modifier, :parent_id,
+                    :permissions, :space, :title, :url, :version) do
+
     def self.from_hash h
-      values = h.values_at(*Page.members.map {|m|m.to_sym}).map {|v| v.is_a?(Hash) ? v[:value]||'' : v}
+      values =
+        h.values_at(*Page.members.map { |m| m.to_sym })
+        .map { |v| v.is_a?(Hash) ? v[:value] || '' : v }
+
       self.new *values
     end
 
-    SKIPPED_KEYS = [:content_status, :created, :creator, :current, :home_page, :modified, :modifier, :url]
+    SKIPPED_KEYS = [:content_status, :created, :creator, :current, :home_page,
+                    :modified, :modifier, :url]
     def to_soap
-      to_h.reject {|k,v| v.nil? || SKIPPED_KEYS.include?(k)}
+      to_h.reject { |k, v| v.nil? || SKIPPED_KEYS.include?(k) }
     end
   end
 
