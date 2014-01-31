@@ -17,20 +17,7 @@ pkg
 
 .DS_Store
 
-# For TextMate
-#*.tmproj
-#tmtags
+# VCR artifacts
+spec/support/vcr_cassettes
 
-# For emacs:
-#*~
-#\#*
-#.\#*
-
-# For vim:
-#*.swp
-
-# For redcar:
-#.redcar
-
-# For rubinius:
-#*.rbc
+config/confluence.yml

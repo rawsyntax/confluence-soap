@@ -1,16 +1,16 @@
 require 'spec_helper'
 
 describe ConfluenceSoap do
-  let (:url) {'http://example.com?wsdl'}
-  subject {ConfluenceSoap.new(url, 'user', 'password')}
+  let (:url) { ConfluenceConfig[:url] }
+  subject do
+    ConfluenceSoap.new(url, ConfluenceConfig[:user],
+                       ConfluenceConfig[:password],
+                       log: false)
 
-  describe 'Page' do
-    ConfluenceSoap::Page.new.to_h
   end
 
   describe '#initialize' do
-    it 'should create a savon soap client with url provided' do
-      Savon.should_receive(:client).with(wsdl: url)
+    it 'creates a savon soap client with url provided' do
       ConfluenceSoap.any_instance.should_receive(:login)
 
       subject
@@ -18,21 +18,12 @@ describe ConfluenceSoap do
   end
 
   describe '#login' do
-    before (:each) do
-      Savon::Client.any_instance.should_receive(:call).twice
-        .with(:login, message: {in0: 'user', in1: 'password'})
-        .and_return(double(:response, body: {login_response: {login_return: 'token'}}))
-    end
+    it 'stores the session token' do
+      VCR.use_cassette(:login) do
+        subject.login
+      end
 
-    it 'should login with savon client' do
-
-      subject.login('user', 'password')
-    end
-
-    it 'should store the login token' do
-      subject.login('user', 'password')
-
-      subject.token.should == 'token'
+      subject.token.should_not be_nil
     end
   end
 

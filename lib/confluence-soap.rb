@@ -22,17 +22,18 @@ class ConfluenceSoap
     end
   end
 
-  def initialize(url, user, password)
+  def initialize(url, user, password, opts = {})
+    opts = opts.merge(wsdl: url)
     @user = user
     @password = password
-    @client = Savon.client(wsdl: url) do
+    @client = Savon.client(opts) do
       convert_request_keys_to :lower_camelcase
     end
-    @token = login(user, password)
+    @token = login
   end
 
-  def login(user, password)
-    response = @client.call :login, message: {in0: user, in1: password}
+  def login
+    response = @client.call :login, message: {in0: @user, in1: @password}
     @token = response.body[:login_response][:login_return]
   end
 
@@ -118,7 +119,7 @@ class ConfluenceSoap
   private
 
   def reconnect
-    login(@user, @password)
+    login
   end
 
   def parse_array_response(method, response)
