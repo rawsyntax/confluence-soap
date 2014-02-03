@@ -1,6 +1,8 @@
 require 'savon'
 
 class ConfluenceSoap
+  module Error; end
+
   attr_reader :client, :token, :user
 
   Page = Struct.new(:content, :content_status, :created, :creator, :current,
@@ -105,18 +107,33 @@ class ConfluenceSoap
     parse_response(:has_user, response)
   end
 
-  def execute(&block)
-    yield self
-    rescue Savon::SOAPFault => e
-      if e.to_hash[:fault][:faultstring] =~ /InvalidSessionException/
-        reconnect
-        yield e
-      else
-        raise e
-      end
+  def execute
+    if block_given?
+      yield
+    else
+      e = StandardError.new('requires a block')
+      e.extend(ConfluenceSoap::Error)
+      raise e
+    end
+  rescue Exception => e
+    if invalid_session?(e)
+      reconnect
+      yield e
+    else
+      e.extend(ConfluenceSoap::Error)
+      raise e
+    end
   end
 
   private
+
+  def invalid_session?(exception)
+    if exception.respond_to?(:to_hash)
+      fault = exception.to_hash.fetch(:fault) { {} }
+
+      fault[:faultstring] =~ /InvalidSessionException/
+    end
+  end
 
   def reconnect
     login

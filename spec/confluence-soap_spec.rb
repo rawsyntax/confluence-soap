@@ -160,15 +160,46 @@ describe ConfluenceSoap do
     end
 
     describe '#execute' do
-      before (:each)  do
-        subject.should_receive(:login)
+
+      context 'with a SOAP related error' do
+        context 'that is an invalid session' do
+          it 'should reconnect to Confluence' do
+            ConfluenceSoap.any_instance
+              .should_receive(:login).twice.and_return('token')
+
+            Savon::SOAPFault.any_instance.stub(:to_hash)
+              .and_return({fault: {faultstring: 'InvalidSessionException'}})
+
+            ex = Savon::SOAPFault.new(nil, nil)
+
+            VCR.use_cassette(:execute_soap_fault) do
+              lambda {
+                subject.execute do
+                  raise ex
+                end
+              }.should_not raise_error(ConfluenceSoap::Error)
+            end
+          end
+        end
+
+        context 'and a valid session' do
+          it "should wrap it with the library's error" do
+            VCR.use_cassette(:execute_non_login_soap_fault) do
+              lambda {
+                subject.execute do
+                  subject.client.call(:nonexistent_endpoint, {})
+                end
+              }.should raise_error(ConfluenceSoap::Error)
+            end
+          end
+        end
       end
 
-      it 'should reconnect when session is invalid' do
-        Savon::SOAPFault.any_instance.stub(:to_hash).and_return({fault: {faultstring: 'InvalidSessionException'}})
-        ex = Savon::SOAPFault.new nil, nil
-        subject.execute do |x|
-          raise ex if x.is_a? ConfluenceSoap
+      context 'without a block' do
+        it 'should raise error' do
+          ConfluenceSoap.any_instance.should_receive(:login).and_return('token')
+
+          lambda { subject.execute }.should raise_error(ConfluenceSoap::Error)
         end
       end
     end
