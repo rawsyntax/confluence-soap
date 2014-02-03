@@ -74,7 +74,7 @@ class ConfluenceSoap
 
   def remove_page(page_id)
     response = @client.call :remove_page, auth_message({in1: page_id})
-    Page.from_hash parse_response :remove_page, response
+    parse_response :remove_page, response
   end
 
   def search(term, criteria = {})
