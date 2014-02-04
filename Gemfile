@@ -7,6 +7,8 @@ group :development do
   gem "rdoc", "~> 3.12"
   gem "pry-debugger"
   gem "pry-stack_explorer"
+  gem "yard"
+  gem "redcarpet"
 end
 
 group :test do
