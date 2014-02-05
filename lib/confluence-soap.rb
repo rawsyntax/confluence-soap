@@ -35,77 +35,103 @@ class ConfluenceSoap
   end
 
   def login
-    response = @client.call :login, message: {in0: @user, in1: @password}
-    @token = response.body[:login_response][:login_return]
+    response = client.call(:login, message: {in0: @user, in1: @password})
+    @token = parse_response(:login, response)
   end
 
   def logout
-    @client.call :logout, message: {in0: @token} if @token
+    client.call(:logout, message: {in0: @token}) if @token
   end
 
   def get_pages(space)
-    response = @client.call :get_pages, auth_message({in1: space})
-    pages = parse_array_response :get_pages, response
+    response = execute do
+      client.call(:get_pages, auth_message({in1: space}))
+    end
+
+    pages = parse_array_response(:get_pages, response)
     pages.map { |page| Page.from_hash(page) }
   end
 
   def get_page(page_id)
-    response = @client.call :get_page, auth_message({in1: page_id})
-    Page.from_hash parse_response :get_page, response
+    response = execute do
+      client.call(:get_page, auth_message({in1: page_id}))
+    end
+
+    Page.from_hash(parse_response(:get_page, response))
   end
 
   def get_children(page_id)
-    response = @client.call :get_children, auth_message({in1: page_id})
-    pages = parse_array_response :get_children, response
+    response = execute do
+      client.call(:get_children, auth_message({in1: page_id}))
+    end
+
+    pages = parse_array_response(:get_children, response)
     pages.map { |page| Page.from_hash(page) }
   end
 
   def store_page(page)
-    response = @client.call :store_page, auth_message({in1: page.to_soap})
-    Page.from_hash parse_response :store_page, response
+    response = execute do
+      client.call(:store_page, auth_message({in1: page.to_soap}))
+    end
+
+    Page.from_hash(parse_response(:store_page, response))
   end
 
   def update_page(page)
-    response =
-      @client.call(:update_page,
-                   auth_message({in1: page.to_soap, in2: {minorEdit: true} }))
-    Page.from_hash parse_response :update_page, response
+    response = execute do
+      client.call(:update_page,
+                  auth_message({in1: page.to_soap, in2: {minorEdit: true} }))
+    end
+
+    Page.from_hash(parse_response(:update_page, response))
   end
 
   def remove_page(page_id)
-    response = @client.call :remove_page, auth_message({in1: page_id})
-    parse_response :remove_page, response
+    response = execute do
+      client.call(:remove_page, auth_message({in1: page_id}))
+    end
+
+    parse_response(:remove_page, response)
   end
 
   def search(term, criteria = {})
     limit    = criteria.delete(:limit) || 20
     criteria = criteria.map { |k, v| {key: k, value: v} }
-    response =
-      @client.call(:search,
-                   auth_message({in1: term, in2: {item: criteria}, in3: limit}))
-    pages = parse_array_response :search, response
+    response = execute do
+      client.call(:search,
+                  auth_message({in1: term, in2: {item: criteria}, in3: limit}))
+    end
+
+    pages = parse_array_response(:search, response)
     pages.map { |page| Page.from_hash(page) }
   end
 
   def add_label_by_name(label, page_id)
-    response =
-      @client.call(:add_label_by_name, auth_message({in1: label, in2: page_id}))
+    response = execute do
+      client.call(:add_label_by_name, auth_message({in1: label, in2: page_id}))
+    end
 
     parse_response(:add_label_by_name, response)
   end
 
   def remove_label_by_name(label, page_id)
-    response =
-      @client.call(:remove_label_by_name,
-                   auth_message({in1: label, in2: page_id}))
+    response = execute do
+      client.call(:remove_label_by_name,
+                  auth_message({in1: label, in2: page_id}))
+    end
 
     parse_response(:remove_label_by_name, response)
   end
 
-  def has_user(user)
-    response = @client.call(:has_user, auth_message({in1: user}))
+  def has_user?(user)
+    response = execute do
+      client.call(:has_user, auth_message({in1: user}))
+    end
+
     parse_response(:has_user, response)
   end
+
+  private
 
   def execute
     if block_given?
@@ -118,14 +144,14 @@ class ConfluenceSoap
   rescue Exception => e
     if invalid_session?(e)
       reconnect
-      yield e
+      # @note necessary for catching an invalid session, and then a
+      # Savon::SOAPFault on the same request
+      execute { yield e }
     else
       e.extend(ConfluenceSoap::Error)
       raise e
     end
   end
-
-  private
 
   def invalid_session?(exception)
     if exception.respond_to?(:to_hash)
@@ -136,7 +162,7 @@ class ConfluenceSoap
   end
 
   def reconnect
-    login
+    @token = login
   end
 
   def parse_array_response(method, response)

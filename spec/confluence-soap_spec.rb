@@ -16,6 +16,23 @@ describe ConfluenceSoap do
 
   end
 
+  shared_context 'invalidate session to force a reconnect' do
+    before(:each) do
+      ignore_request do
+        @token = subject.token
+
+        subject.client.stub(:call)
+          .and_return(double(body:
+                             {login_response:
+                               {login_return: 'invalid_token'}}))
+        subject.login
+        subject.client.unstub(:call)
+        subject.stub(:login).and_return(@token)
+      end
+    end
+  end
+
+
   describe '#initialize' do
     it 'creates a savon soap client with url provided' do
       ConfluenceSoap.any_instance.should_receive(:login)
@@ -36,8 +53,9 @@ describe ConfluenceSoap do
   end
 
   describe 'with an authenticated user' do
-    describe '#store_page' do
+    include_context 'invalidate session to force a reconnect'
 
+    describe '#store_page' do
       it 'stores the page and returns it' do
         ignore_request do
           subject.store_page(page).should be_instance_of(ConfluenceSoap::Page)
@@ -133,53 +151,6 @@ describe ConfluenceSoap do
           subject.remove_page(page_id).should == true
         end
       end
-    end
-
-    describe '#execute' do
-
-      context 'with a SOAP related error' do
-        context 'that is an invalid session' do
-          it 'should reconnect to Confluence' do
-            ConfluenceSoap.any_instance
-              .should_receive(:login).twice.and_return('token')
-
-            Savon::SOAPFault.any_instance.stub(:to_hash)
-              .and_return({fault: {faultstring: 'InvalidSessionException'}})
-
-            ex = Savon::SOAPFault.new(nil, nil)
-
-            VCR.use_cassette(:execute_soap_fault) do
-              lambda {
-                subject.execute do
-                  raise ex
-                end
-              }.should_not raise_error(ConfluenceSoap::Error)
-            end
-          end
-        end
-
-        context 'and a valid session' do
-          it "should wrap it with the library's error" do
-            VCR.use_cassette(:execute_non_login_soap_fault) do
-              lambda {
-                subject.execute do
-                  subject.client.call(:nonexistent_endpoint, {})
-                end
-              }.should raise_error(ConfluenceSoap::Error)
-            end
-          end
-        end
-      end
-
-      context 'without a block' do
-        it 'should raise error' do
-          ConfluenceSoap.any_instance.should_receive(:login).and_return('token')
-
-          lambda { subject.execute }.should raise_error(ConfluenceSoap::Error)
-        end
-      end
-
-
     end
   end
 end
