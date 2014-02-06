@@ -10,18 +10,17 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 ConfluenceConfig = YAML.load(File.read("config/confluence.yml"))
 
-
 RSpec.configure do |config|
   config.before(:suite) do
     ignore_request { delete_all_pages_in_test_space }
   end
 end
 
-
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/support/vcr_cassettes'
   c.hook_into :webmock # or :fakeweb
 end
+
 def delete_all_pages_in_test_space
   client = Savon.client(wsdl: ConfluenceConfig[:url], log: false) do
     convert_request_keys_to :lower_camelcase
