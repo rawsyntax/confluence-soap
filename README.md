@@ -3,7 +3,16 @@ confluence-soap
 
 Ruby client for Confluence's SOAP API
 
-    http://<confluence-install>/rpc/soap-axis/confluenceservice-v2?wsdl
+    http://<confluence-install>/wiki/rpc/soap-axis/confluenceservice-v2?wsdl
+
+## Running the specs
+
+First:
+`cp config/confluence.yml.example config/confluence.yml`
+
+Then edit `config/confluence.yml` to match your instance's settings.
+You should create a separate confluence space for the specs to run
+against, as running the specs will delete all pages in that space.
 
 ## Contributing to confluence-soap
 
