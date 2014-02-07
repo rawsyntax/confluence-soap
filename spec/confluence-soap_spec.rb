@@ -42,6 +42,18 @@ describe ConfluenceSoap do
     end
   end
 
+  context 'when #login repeatedly fails' do
+    it 'should raise the library error' do
+      ConfluenceSoap.any_instance.stub(:login).and_return('invalid-token')
+
+      VCR.use_cassette(:repeated_login_failures) do
+        lambda {
+          subject.get_pages(space)
+        }.should raise_error(ConfluenceSoap::Error)
+      end
+    end
+  end
+
   describe '#login' do
     it 'stores the session token' do
       VCR.use_cassette(:login) do

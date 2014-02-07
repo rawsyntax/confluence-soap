@@ -137,19 +137,16 @@ class ConfluenceSoap
     if block_given?
       yield
     else
-      e = StandardError.new('requires a block')
-      e.extend(ConfluenceSoap::Error)
-      raise e
+      tag_errors { raise StandardError.new('requires a block') }
     end
   rescue Exception => e
     if invalid_session?(e)
       reconnect
       # @note necessary for catching an invalid session, and then a
-      # Savon::SOAPFault on the same request
-      execute { yield e }
+      #   Savon::SOAPFault on the same request
+      tag_errors { yield e }
     else
-      e.extend(ConfluenceSoap::Error)
-      raise e
+      tag_errors { raise e }
     end
   end
 
