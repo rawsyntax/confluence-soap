@@ -161,6 +161,13 @@ class ConfluenceSoap
     end
   end
 
+  def tag_errors
+    yield
+  rescue Exception => e
+    e.extend(ConfluenceSoap::Error)
+    raise
+  end
+
   def reconnect
     @token = login
   end
