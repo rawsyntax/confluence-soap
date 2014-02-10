@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-gem 'savon'
+gem 'savon', '~> 2.3.3'
 
 group :development do
   gem "bundler", "~> 1.0"
