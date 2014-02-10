@@ -5,6 +5,16 @@ Ruby client for Confluence's SOAP API
 
     http://<confluence-install>/wiki/rpc/soap-axis/confluenceservice-v2?wsdl
 
+## Example Usage
+
+```ruby
+require 'confluence-soap'
+
+cs = ConfluenceSoap.new("http://<confluence-install>/wiki/rpc/soap-axis/confluenceservice-v2?wsdl",
+                        "user", "password")
+
+cs.get_pages("name_of_your_space")
+```
 ## Running the specs
 
 First:
