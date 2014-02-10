@@ -1,0 +1,4 @@
+:space: test_environment_space
+:url: https://<your-instance-host>/wiki/rpc/soap-axis/confluenceservice-v2?wsdl
+:user: api_user
+:password: password
