@@ -125,6 +125,15 @@ describe ConfluenceSoap do
       end
     end
 
+    describe '#convert_wiki_to_storage_format' do
+      it 'should covert wiki to Confluence storage format' do
+        ignore_request do
+          subject.convert_wiki_to_storage_format('h2. Heading')
+            .should == '<h2>Heading</h2>'
+        end
+      end
+    end
+
     describe '#search' do
       it 'should search with savon' do
         VCR.use_cassette(:search_without_results) do

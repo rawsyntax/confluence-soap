@@ -86,6 +86,13 @@ class ConfluenceSoap
     Page.from_hash(parse_response(:update_page, response))
   end
 
+  def convert_wiki_to_storage_format(text)
+    response = execute do
+      client.call(:convert_wiki_to_storage_format, auth_message({in1: text}))
+    end
+    parse_response(:convert_wiki_to_storage_format, response)
+  end
+
   def remove_page(page_id)
     response = execute do
       client.call(:remove_page, auth_message({in1: page_id}))
