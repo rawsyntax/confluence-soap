@@ -77,10 +77,10 @@ class ConfluenceSoap
     Page.from_hash(parse_response(:store_page, response))
   end
 
-  def update_page(page)
+  def update_page(page, options = {minorEdit: true})
     response = execute do
       client.call(:update_page,
-                  auth_message({in1: page.to_soap, in2: {minorEdit: true} }))
+                  auth_message({in1: page.to_soap, in2: options }))
     end
 
     Page.from_hash(parse_response(:update_page, response))
