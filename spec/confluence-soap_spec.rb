@@ -125,6 +125,29 @@ describe ConfluenceSoap do
       end
     end
 
+    describe '#update_page_with_options' do
+      it 'should store page given specified options with savon' do
+        ignore_request do
+          @page = subject.get_pages(space).first
+        end
+
+        VCR.use_cassette(:update_page) do
+          @page.content = 'my edits'
+          options = {minorEdit: true, versionComment: 'uploaded by confluence-soap'}
+          subject.update_page(@page, options).should be_instance_of(ConfluenceSoap::Page)
+        end
+      end
+    end
+
+    describe '#convert_wiki_to_storage_format' do
+      it 'should covert wiki to Confluence storage format' do
+        ignore_request do
+          subject.convert_wiki_to_storage_format('h2. Heading')
+            .should == '<h2>Heading</h2>'
+        end
+      end
+    end
+
     describe '#search' do
       it 'should search with savon' do
         VCR.use_cassette(:search_without_results) do
